@@ -39,6 +39,9 @@
 #define SC_PrintChar 17
 #define SC_ReadString 18
 #define SC_PrintString 19
+#define SC_PrintNum 20
+#define SC_ReadNum 21
+#define SC_RandomNum 22
 #define SC_Add		42
 
 #ifndef IN_ASM
@@ -69,6 +72,9 @@ void PrintChar(char character);
 void PrintString(char buffer[]);
 void ReadString(char buffer [], int length);
 
+void ReadNum();
+void PrintNum(int op1);
+int RandomNum();
 /* Address space control operations: Exit, Exec, Execv, and Join */
 
 /* This user program is done (status = 0 means exited normally). */

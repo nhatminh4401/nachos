@@ -61,6 +61,58 @@ void ExceptionHandler(ExceptionType which)
 
 	switch (which)
 	{
+	case NoException:
+		return;
+	case PageFaultException:
+	{
+		DEBUG(dbgSys, "\n No valid trasnition found");
+		SysHalt();
+		ASSERTNOTREACHED();
+		break;
+	}
+	case ReadOnlyException:
+	{
+		DEBUG(dbgSys, "\n Write attempted to page marked read-only");
+		SysHalt();
+		ASSERTNOTREACHED();
+		break;
+	}
+	case BusErrorException:
+	{
+		DEBUG(dbgSys, "\n Translation resulted invalid physical address");
+		SysHalt();
+		ASSERTNOTREACHED();
+		break;
+	}
+	case AddressErrorException:
+	{
+		DEBUG(dbgSys, "\n Unaligned reference or one that was beyond the end of the address space");
+		SysHalt();
+		ASSERTNOTREACHED();
+		break;
+	}
+	case OverflowException:
+	{
+		DEBUG(dbgSys, "\n Integer overflow in add or sub.");
+		SysHalt();
+		ASSERTNOTREACHED();
+		break;
+	}
+	case IllegalInstrException:
+	{
+		DEBUG(dbgSys, "\n Unimplemented or reserved instr.");
+		SysHalt();
+		ASSERTNOTREACHED();
+		break;
+	}
+	case NumExceptionTypes:
+	{
+		DEBUG(dbgSys, "\n Number exception types");
+		SysHalt();
+		ASSERTNOTREACHED();
+		break;
+	}
+
 	case SyscallException:
 		switch (type)
 		{
@@ -100,6 +152,109 @@ void ExceptionHandler(ExceptionType which)
 			ASSERTNOTREACHED();
 			break;
 
+		case SC_ReadNum:
+		{
+			char num_string[11] = {0}; // max value and min value of C have 11 numbers
+			long long l = 0;
+			for (int i = 0; i < 11; i++)
+			{
+				char c;
+				c = kernel->synchConsoleIn->GetChar();
+				if (c >= '0' && c <= '9') //Check if input are character or int
+					num_string[i] = c;
+				else if (i == 0 && c == '-') // Check to head of char
+					num_string[i] = c;
+				else
+					break;
+			}
+			int i = (num_string[0] == '-') ? 1 : 0;
+			while (i < 11 && num_string[i] >= '0' && num_string[i] <= '9')
+				l = l * 10 + num_string[i++] - '0';
+			l = (num_string[0] == '-') ? (-l) : l;
+			kernel->machine->WriteRegister(2, (int)l);
+			DEBUG(dbgSys, l);
+			{
+				/* set previous programm counter (debugging only)*/
+				kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+
+				/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+				kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+
+				/* set next programm counter for brach execution */
+				kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			}
+			return;
+			ASSERTNOTREACHED();
+			break;
+		}
+		case SC_PrintNum:
+		{
+			int n = kernel->machine->ReadRegister(4);
+
+			char num_string[11] = {0};
+			int tmp[11] = {0}, i = 0, j = 0;
+
+			if (n < 0) //Check if N is negative
+			{
+				n = -n;
+				num_string[i++] = '-';
+			}
+
+			do
+			{
+				tmp[j++] = n % 10; //Take rightmost number
+				n /= 10;
+			} while (n);
+			while (j)
+				num_string[i++] = '0' + (char)tmp[--j];
+			for (int z = 0; z < i; z++)
+				kernel->synchConsoleOut->PutChar(num_string[z]);
+
+			kernel->machine->WriteRegister(2, 0);
+
+			/* Modify return point */
+			{
+				/* set previous programm counter (debugging only)*/
+				kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+
+				/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+				kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+
+				/* set next programm counter for brach execution */
+				kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			}
+
+			return;
+
+			ASSERTNOTREACHED();
+
+			break;
+		}
+		case SC_RandomNum:
+		{
+			RandomInit(time(0));	// from sysdep.cc nachos
+			int n = RandomNumber(); //from sysdep.cc nachos
+			DEBUG(dbgSys, n);
+			kernel->machine->WriteRegister(2, int(n));
+
+			/* Modify return point */
+			{
+				/* set previous programm counter (debugging only)*/
+				kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+
+				/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+				kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+
+				/* set next programm counter for brach execution */
+				kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			}
+
+			return;
+
+			ASSERTNOTREACHED();
+
+			break;
+		}
 		case SC_ReadChar:
 
 			c = kernel->synchConsoleIn->GetChar();	   //Read char (input)
