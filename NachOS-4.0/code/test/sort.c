@@ -4,7 +4,7 @@
 void Bubble_Sort_Ascending(int arr[], int n)
 {
   int i, j, temp;
-  for (i = 0; i < n - 2; i++)
+  for (i = 0; i < n - 1; i++)
   {
     for (j = n - 1; j > i; j--)
     {
@@ -21,7 +21,7 @@ void Bubble_Sort_Ascending(int arr[], int n)
 void Bubble_Sort_Descending(int arr[], int n)
 {
   int i, j, temp;
-  for (i = 0; i < n - 2; i++)
+  for (i = 0; i < n - 1; i++)
   {
     for (j = n - 1; j > i; j--)
     {

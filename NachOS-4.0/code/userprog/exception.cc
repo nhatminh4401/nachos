@@ -156,10 +156,17 @@ void ExceptionHandler(ExceptionType which)
 		{
 			char num_string[11] = {0}; // max value and min value of C have 11 numbers
 			long long l = 0;
-			for (int i = 0; i < 11; i++)
+			char c;
+			int flag_overflow=0;
+			for (int i = 0; i < 12; i++)
 			{
-				char c;
 				c = kernel->synchConsoleIn->GetChar();
+				if (i==11 && c >= '0' && c <= '9') // Check if input are larger than 11 numbers
+				{
+					cerr<<"Integer overflow";
+					flag_overflow=1;
+					break;
+				}
 				if (c >= '0' && c <= '9') //Check if input are character or int
 					num_string[i] = c;
 				else if (i == 0 && c == '-') // Check to head of char
@@ -167,12 +174,14 @@ void ExceptionHandler(ExceptionType which)
 				else
 					break;
 			}
+
 			int i = (num_string[0] == '-') ? 1 : 0;
 			while (i < 11 && num_string[i] >= '0' && num_string[i] <= '9')
 				l = l * 10 + num_string[i++] - '0';
 			l = (num_string[0] == '-') ? (-l) : l;
+			if (flag_overflow==1)
+				l=0;
 			kernel->machine->WriteRegister(2, (int)l);
-			DEBUG(dbgSys, l);
 			{
 				/* set previous programm counter (debugging only)*/
 				kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
@@ -191,7 +200,7 @@ void ExceptionHandler(ExceptionType which)
 		{
 			int n = kernel->machine->ReadRegister(4);
 
-			char num_string[11] = {0};
+			char num_string[11] = {0}; // max value and min value of C have 11 numbers
 			int tmp[11] = {0}, i = 0, j = 0;
 
 			if (n < 0) //Check if N is negative

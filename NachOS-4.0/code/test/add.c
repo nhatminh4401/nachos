@@ -12,11 +12,9 @@ int main()
   int result;
   char c;
   char str[100];
-  result = Add(42, 23);
-  //  c = ReadChar();
-  //  PrintChar(c);
-  ReadString(str, 100);
-  PrintString(str);
+  result=ReadNum();
+
+  PrintNum(150125012);
   Halt();
   /* not reached */
 }

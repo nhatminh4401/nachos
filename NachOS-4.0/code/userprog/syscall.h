@@ -72,7 +72,7 @@ void PrintChar(char character);
 void PrintString(char buffer[]);
 void ReadString(char buffer [], int length);
 
-void ReadNum();
+int  ReadNum();
 void PrintNum(int op1);
 int RandomNum();
 /* Address space control operations: Exit, Exec, Execv, and Join */
