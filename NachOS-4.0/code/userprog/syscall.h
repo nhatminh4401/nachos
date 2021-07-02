@@ -35,6 +35,10 @@
 #define SC_ThreadExit   14
 #define SC_ThreadJoin   15
 
+#define SC_ReadChar 16
+#define SC_PrintChar 17
+#define SC_ReadString 18
+#define SC_PrintString 19
 #define SC_Add		42
 
 #ifndef IN_ASM
@@ -58,6 +62,12 @@ void Halt();
  */ 
 
 int Add(int op1, int op2);
+
+char ReadChar();
+
+void PrintChar(char character);
+void PrintString(char buffer[]);
+void ReadString(char buffer [], int length);
 
 /* Address space control operations: Exit, Exec, Execv, and Join */
 
