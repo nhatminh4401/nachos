@@ -6,7 +6,7 @@
 
 int main()
 {
-  int i=32;
+  int i=33;
   while(i<127)
   {
     PrintNum(i);
