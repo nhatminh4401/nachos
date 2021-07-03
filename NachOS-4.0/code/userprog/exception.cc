@@ -152,7 +152,7 @@ void ExceptionHandler(ExceptionType which)
 			ASSERTNOTREACHED();
 			break;
 
-		case SC_ReadNum:
+		case SC_ReadNum: //Read Interger
 		{
 			char num_string[11] = {0}; // max value and min value of C have 11 numbers
 			long long l = 0;
@@ -196,7 +196,7 @@ void ExceptionHandler(ExceptionType which)
 			ASSERTNOTREACHED();
 			break;
 		}
-		case SC_PrintNum:
+		case SC_PrintNum: //Print Interger on screen
 		{
 			int n = kernel->machine->ReadRegister(4);
 
@@ -239,7 +239,7 @@ void ExceptionHandler(ExceptionType which)
 
 			break;
 		}
-		case SC_RandomNum:
+		case SC_RandomNum: //Randomize an interger number
 		{
 			RandomInit(time(0));	// from sysdep.cc nachos
 			int n = RandomNumber(); //from sysdep.cc nachos
@@ -264,7 +264,7 @@ void ExceptionHandler(ExceptionType which)
 
 			break;
 		}
-		case SC_ReadChar:
+		case SC_ReadChar: //Read a character
 
 			c = kernel->synchConsoleIn->GetChar();	   //Read char (input)
 			kernel->machine->WriteRegister(2, (int)c); //Write to register 2
@@ -280,7 +280,7 @@ void ExceptionHandler(ExceptionType which)
 			ASSERTNOTREACHED();
 			break;
 
-		case SC_PrintChar:
+		case SC_PrintChar: //Print a character
 
 			c = (char)kernel->machine->ReadRegister(4); //Read from memory r4 to get value
 			kernel->synchConsoleOut->PutChar(c);		//Write char
@@ -296,7 +296,7 @@ void ExceptionHandler(ExceptionType which)
 			ASSERTNOTREACHED();
 			break;
 
-		case SC_ReadString:
+		case SC_ReadString: //Read char* with length
 			// initialize variables
 			int i;
 			buffer = kernel->machine->ReadRegister(4); //Get the value from register r4
@@ -338,7 +338,7 @@ void ExceptionHandler(ExceptionType which)
 			ASSERTNOTREACHED();
 			break;
 
-		case SC_PrintString:
+		case SC_PrintString: //Print char*
 			vaddr = kernel->machine->ReadRegister(4);
 			kernel->machine->ReadMem(vaddr, 1, &memval); //read memory to get value address
 			while ((*(char *)&memval) != '\0')			 //While not end of string (\0)
