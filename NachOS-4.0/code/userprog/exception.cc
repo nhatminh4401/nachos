@@ -48,6 +48,10 @@
 //	"which" is the kind of exception.  The list of possible exceptions
 //	is in machine.h.
 //----------------------------------------------------------------------
+void processCreator(void* arg)
+{
+	kernel->currentThread->space->Execute();
+}
 
 void ExceptionHandler(ExceptionType which)
 {
@@ -123,7 +127,48 @@ void ExceptionHandler(ExceptionType which)
 
 			ASSERTNOTREACHED();
 			break;
+		case SC_Exec:
+			char *filename;
+			filename = new char[100];
 
+			int buffadd;
+			buffadd = kernel->machine->ReadRegister(4); /* only one argument, so that’s in R4 */
+			int ch;
+			int i;
+			//find a proper place to free this allocation
+			if (!kernel->machine->ReadMem(buffadd, 1, &ch))
+				return;
+			i = 0;
+			while (ch != 0)
+			{
+				filename[i] = (char)ch;
+				buffadd += 1;
+				i++;
+				if (!kernel->machine->ReadMem(buffadd, 1, &ch))
+					return;
+			}
+
+			AddrSpace *space;
+			space = new AddrSpace();
+			space->Load(filename);
+			Thread *t;
+			t = new Thread(filename);
+			t->space = space;
+			int processId;
+			processId = t->getId(); /* create this function by yourself */
+			filename[i] = (char)0;
+			/* now filename contains the file */
+			t->Fork(processCreator, 0);
+			kernel->machine->WriteRegister(2, processId);
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			return;
+			ASSERTNOTREACHED();
+			break;
 		case SC_Add:
 			DEBUG(dbgSys, "Adding... " << kernel->machine->ReadRegister(4) << " + " << kernel->machine->ReadRegister(5) << "\n");
 
@@ -157,14 +202,14 @@ void ExceptionHandler(ExceptionType which)
 			char num_string[11] = {0}; // max value and min value of C have 11 numbers
 			long long l = 0;
 			char c;
-			int flag_overflow=0;
+			int flag_overflow = 0;
 			for (int i = 0; i < 12; i++)
 			{
 				c = kernel->synchConsoleIn->GetChar();
-				if (i==11 && c >= '0' && c <= '9') // Check if input are larger than 11 numbers
+				if (i == 11 && c >= '0' && c <= '9') // Check if input are larger than 11 numbers
 				{
-					cerr<<"Integer overflow";
-					flag_overflow=1;
+					cerr << "Integer overflow";
+					flag_overflow = 1;
 					break;
 				}
 				if (c >= '0' && c <= '9') //Check if input are character or int
@@ -179,8 +224,8 @@ void ExceptionHandler(ExceptionType which)
 			while (i < 11 && num_string[i] >= '0' && num_string[i] <= '9')
 				l = l * 10 + num_string[i++] - '0';
 			l = (num_string[0] == '-') ? (-l) : l;
-			if (flag_overflow==1)
-				l=0;
+			if (flag_overflow == 1)
+				l = 0;
 			kernel->machine->WriteRegister(2, (int)l);
 			{
 				/* set previous programm counter (debugging only)*/
@@ -298,7 +343,6 @@ void ExceptionHandler(ExceptionType which)
 
 		case SC_ReadString: //Read char* with length
 			// initialize variables
-			int i;
 			buffer = kernel->machine->ReadRegister(4); //Get the value from register r4
 			length = kernel->machine->ReadRegister(5); //Get the value from register r5
 			buf = NULL;

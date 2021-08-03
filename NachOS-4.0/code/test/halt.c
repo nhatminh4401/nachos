@@ -15,6 +15,7 @@
 int
 main()
 {
+    Exec("../test/help");
     Halt();
     /* not reached */
 }

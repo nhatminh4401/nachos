@@ -80,7 +80,7 @@ class Thread {
     // THEY MUST be in this position for SWITCH to work.
     int *stackTop;			 // the current stack pointer
     void *machineState[MachineStateSize];  // all registers except for stackTop
-
+    int threadId;
   public:
     Thread(char* debugName);		// initialize a Thread 
     ~Thread(); 				// deallocate a Thread
@@ -102,6 +102,7 @@ class Thread {
     void CheckOverflow();   	// Check if thread stack has overflowed
     void setStatus(ThreadStatus st) { status = st; }
     char* getName() { return (name); }
+    int getId() { return (threadId); }
     void Print() { cout << name; }
     void SelfTest();		// test whether thread impl is working
 
