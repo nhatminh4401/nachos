@@ -22,15 +22,16 @@ class AddrSpace {
   public:
     AddrSpace();			// Create an address space.
     ~AddrSpace();			// De-allocate an address space
-
+    
+    // AddrSpace(char* filename);
     bool Load(char *fileName);		// Load a program into addr space from
                                         // a file
 					// return false if not found
 
-    void Execute();             	// Run a program
+    void Execute(int id);             	// Run a program
 					// assumes the program has already
                                         // been loaded
-
+    void Execute(char* filename);  
     void SaveState();			// Save/restore address space-specific
     void RestoreState();		// info on a context switch 
 
@@ -38,7 +39,7 @@ class AddrSpace {
     // to physical address _paddr_. _mode_
     // is 0 for Read, 1 for Write.
     ExceptionType Translate(unsigned int vaddr, unsigned int *paddr, int mode);
-
+    
   private:
     TranslationEntry *pageTable;	// Assume linear page table translation
 					// for now!

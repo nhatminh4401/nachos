@@ -21,10 +21,14 @@
 #include "switch.h"
 #include "synch.h"
 #include "sysdep.h"
-
+#include "bitmap.h"
+#include "ptable.h"
 // this is put at the top of the execution stack, for detecting stack overflows
 const int STACK_FENCEPOST = 0xdedbeef;
 
+Semaphore *addrLock;
+Bitmap *gPhysPageBitMap;
+PTable *pTab;
 //----------------------------------------------------------------------
 // Thread::Thread
 // 	Initialize a thread control block, so that we can then call
@@ -90,7 +94,7 @@ Thread::~Thread()
 //----------------------------------------------------------------------
 
 void 
-Thread::Fork(VoidFunctionPtr func, void *arg)
+Thread::Fork(VoidFunctionPtr func, void* arg)
 {
     Interrupt *interrupt = kernel->interrupt;
     Scheduler *scheduler = kernel->scheduler;
@@ -304,7 +308,7 @@ PLabelToAddr(void *plabel)
 //----------------------------------------------------------------------
 
 void
-Thread::StackAllocate (VoidFunctionPtr func, void *arg)
+Thread::StackAllocate (VoidFunctionPtr func, void* arg)
 {
     stack = (int *) AllocBoundedArray(StackSize * sizeof(int));
 
@@ -430,7 +434,7 @@ Thread::SelfTest()
 
     Thread *t = new Thread("forked thread");
 
-    t->Fork((VoidFunctionPtr) SimpleThread, (void *) 1);
+    t->Fork((VoidFunctionPtr) SimpleThread,(void*) 1);
     kernel->currentThread->Yield();
     SimpleThread(0);
 }

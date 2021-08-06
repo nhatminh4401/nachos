@@ -6,5 +6,5 @@ int main()
     {
         PrintChar('A');
     }
-    Halt();
+    // Halt();
 }

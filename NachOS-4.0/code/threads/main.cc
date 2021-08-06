@@ -45,7 +45,9 @@
 #include "filesys.h"
 #include "openfile.h"
 #include "sysdep.h"
-
+#include "synch.h"
+#include "bitmap.h"
+#include "ptable.h"
 // global variables
 Kernel *kernel;
 Debug *debug;
@@ -243,6 +245,13 @@ main(int argc, char **argv)
 	}
 
     }
+    extern Semaphore *addrLock;
+    extern Bitmap *gPhysPageBitMap;
+    extern PTable *pTab; 
+    addrLock = new Semaphore("addrLock", 1);
+    gPhysPageBitMap = new Bitmap(256);
+    pTab = new PTable(10);
+    
     debug = new Debug(debugArg);
     
     DEBUG(dbgThread, "Entering main");
@@ -285,10 +294,10 @@ main(int argc, char **argv)
 
     // finally, run an initial user program if requested to do so
     if (userProgName != NULL) {
-      AddrSpace *space = new AddrSpace;
+      AddrSpace *space = new AddrSpace();
       ASSERT(space != (AddrSpace *)NULL);
       if (space->Load(userProgName)) {  // load the program into the space
-	space->Execute();              // run the program
+	space->Execute(userProgName);              // run the program
 	ASSERTNOTREACHED();            // Execute never returns
       }
     }

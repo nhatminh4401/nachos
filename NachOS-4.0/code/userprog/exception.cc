@@ -26,6 +26,7 @@
 #include "synchconsole.h"
 #include "syscall.h"
 #include "ksyscall.h"
+#include "ptable.h"
 //----------------------------------------------------------------------
 // ExceptionHandler
 // 	Entry point into the Nachos kernel.  Called when a user program
@@ -48,9 +49,10 @@
 //	"which" is the kind of exception.  The list of possible exceptions
 //	is in machine.h.
 //----------------------------------------------------------------------
-void processCreator(void* arg)
+
+void StartProcess(int arg)
 {
-	kernel->currentThread->space->Execute();
+	kernel->currentThread->space->Execute(arg);
 }
 
 void ExceptionHandler(ExceptionType which)
@@ -148,18 +150,23 @@ void ExceptionHandler(ExceptionType which)
 					return;
 			}
 
-			AddrSpace *space;
-			space = new AddrSpace();
-			space->Load(filename);
-			Thread *t;
-			t = new Thread(filename);
-			t->space = space;
-			int processId;
-			processId = t->getId(); /* create this function by yourself */
+			// AddrSpace *space;
+			// space = new AddrSpace();
+			// space->Load(filename);
+			// Thread *t;
+			// t = new Thread(filename);
+			// t->space = space;
+			// int processId;
+			// processId = t->getId(); /* create this function by yourself */
 			filename[i] = (char)0;
 			/* now filename contains the file */
-			t->Fork(processCreator, 0);
-			kernel->machine->WriteRegister(2, processId);
+			//t->Fork(StartProcess, 0);
+			//kernel->machine->WriteRegister(2, processId);
+			extern PTable *pTab;
+			// Return child process id
+			int id;
+			id = pTab->ExecUpdate(filename);
+			kernel->machine->WriteRegister(2, id);
 			/* set previous programm counter (debugging only)*/
 			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
 			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
@@ -169,6 +176,62 @@ void ExceptionHandler(ExceptionType which)
 			return;
 			ASSERTNOTREACHED();
 			break;
+		case SC_Join:
+		{
+			// int Join(SpaceId id)
+			// Input: id dia chi cua thread
+			// Output:
+			int id;
+			id = kernel->machine->ReadRegister(4);
+
+			int res = pTab->JoinUpdate(id);
+
+			kernel->machine->WriteRegister(2, res);
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			return;
+			ASSERTNOTREACHED();
+			break;
+		}
+		case SC_Exit:
+		{
+			//void Exit(int status);
+			// Input: status code
+			int exitStatus = kernel->machine->ReadRegister(4);
+
+			if (exitStatus != 0)
+			{
+				
+				/* set previous programm counter (debugging only)*/
+				kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+				/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+				kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+				/* set next programm counter for brach execution */
+				kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+				return;
+				// ASSERTNOTREACHED();
+				// break;
+			}
+
+			int res = pTab->ExitUpdate(exitStatus);
+
+			kernel->currentThread->FreeSpace();
+			kernel->currentThread->Finish();
+			kernel->machine->WriteRegister(2, res);
+			/* set previous programm counter (debugging only)*/
+			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
+			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
+			kernel->machine->WriteRegister(PCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			/* set next programm counter for brach execution */
+			kernel->machine->WriteRegister(NextPCReg, kernel->machine->ReadRegister(PCReg) + 4);
+			return;
+			ASSERTNOTREACHED();
+			break;
+		}
 		case SC_Add:
 			DEBUG(dbgSys, "Adding... " << kernel->machine->ReadRegister(4) << " + " << kernel->machine->ReadRegister(5) << "\n");
 
