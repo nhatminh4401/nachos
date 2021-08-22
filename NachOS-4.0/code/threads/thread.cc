@@ -41,7 +41,7 @@ Thread::Thread(char* threadName)
     name = threadName;
     stackTop = NULL;
     stack = NULL;
-    threadId = 0;
+    pid = 0;
     status = JUST_CREATED;
     for (int i = 0; i < MachineStateSize; i++) {
 	machineState[i] = NULL;		// not strictly necessary, since

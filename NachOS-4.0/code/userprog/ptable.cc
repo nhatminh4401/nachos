@@ -52,7 +52,7 @@ int PTable::ExecUpdate(char* name)
 	pcb[index]->SetFileName(name);
 
 	// parrentID là processID của currentThread
-    pcb[index]->parentID = kernel->currentThread->threadId;
+    pcb[index]->parentID = kernel->currentThread->pid;
 
 	// Gọi thực thi phương thức Exec của lớp PCB.
 	int pid = pcb[index]->Exec(name,index);
@@ -74,7 +74,7 @@ int PTable::JoinUpdate(int id)
 int PTable::ExitUpdate(int exitcode)
 {              
     // Nếu tiến trình gọi là main process thì gọi Halt().
-	int id = kernel->currentThread->threadId;
+	int id = kernel->currentThread->pid;
 	if(id == 0)
 	{
 		

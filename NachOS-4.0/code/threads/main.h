@@ -11,11 +11,8 @@
 #include "copyright.h"
 #include "debug.h"
 #include "kernel.h"
-// #include "ptable.h"
+
 extern Kernel *kernel;
 extern Debug *debug;
-// Semaphore *addrLock;
-// Bitmap *gPhysPageBitMap;
-// PTable *pTab;
 #endif // MAIN_H
 

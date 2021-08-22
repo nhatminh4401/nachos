@@ -102,7 +102,7 @@ class Thread {
     void CheckOverflow();   	// Check if thread stack has overflowed
     void setStatus(ThreadStatus st) { status = st; }
     char* getName() { return (name); }
-    int getId() { return (threadId); }
+    int getId() { return (pid); }
     void Print() { cout << name; }
     void SelfTest();		// test whether thread impl is working
 
@@ -130,7 +130,7 @@ class Thread {
     void RestoreUserState();		// restore user-level register state
 
     AddrSpace *space;			// User code this thread is running.
-    int threadId;
+    int pid;
     int exitStatus;
     void FreeSpace(){
         if (space != 0)

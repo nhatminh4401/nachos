@@ -9,7 +9,7 @@ PCB::PCB(int id)
     if (id == 0)
         this->parentID = -1;
     else
-        this->parentID = kernel->currentThread->threadId;
+        this->parentID = kernel->currentThread->pid;
 
 	this->exitcode = 0;
 	this->thread = NULL;
@@ -28,7 +28,7 @@ PCB::~PCB()
 		
 	}
 }
-int PCB::GetID(){ return this->thread->threadId; }
+int PCB::GetID(){ return this->thread->pid; }
 int PCB::GetExitCode() { return this->exitcode; }
 void PCB::SetExitCode(int ec){ this->exitcode = ec; }
 
@@ -61,9 +61,9 @@ int PCB::Exec(char* filename, int id)
 	}
 
 	//  Đặt processID của thread này là id.
-	this->thread->threadId = id;
+	this->thread->pid = id;
 	// Đặt parrentID của thread này là processID của thread gọi thực thi Exec
-	this->parentID = kernel->currentThread->threadId;
+	this->parentID = kernel->currentThread->pid;
  	this->thread->Fork((VoidFunctionPtr) &StartProcess,(void*) id);
 
 	// Trả về id.

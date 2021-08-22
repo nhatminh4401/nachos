@@ -156,8 +156,7 @@ void ExceptionHandler(ExceptionType which)
 			int id;
 			id = pTab->ExecUpdate(filename);
 			kernel->machine->WriteRegister(2, id);
-
-
+			
 			/* set previous programm counter (debugging only)*/
 			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
 			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/
