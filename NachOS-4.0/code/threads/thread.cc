@@ -26,7 +26,6 @@
 // this is put at the top of the execution stack, for detecting stack overflows
 const int STACK_FENCEPOST = 0xdedbeef;
 
-Semaphore *addrLock;
 Bitmap *gPhysPageBitMap;
 PTable *pTab;
 //----------------------------------------------------------------------

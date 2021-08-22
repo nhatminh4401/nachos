@@ -5,6 +5,7 @@
         "system_error": "cpp",
         "syscall.h": "c",
         "errno.h": "c",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "new": "cpp"
     }
 }

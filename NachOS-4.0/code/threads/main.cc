@@ -245,10 +245,8 @@ main(int argc, char **argv)
 	}
 
     }
-    extern Semaphore *addrLock;
     extern Bitmap *gPhysPageBitMap;
     extern PTable *pTab; 
-    addrLock = new Semaphore("addrLock", 1);
     gPhysPageBitMap = new Bitmap(256);
     pTab = new PTable(10);
     

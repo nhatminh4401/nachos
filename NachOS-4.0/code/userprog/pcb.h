@@ -8,12 +8,8 @@ class PCB
 {
 private:
     Semaphore* joinsem;         // semaphore cho quá trình join
-    Semaphore* exitsem;         // semaphore cho quá trình exit
-    Semaphore* multex;          // semaphore cho quá trình truy xuất đọc quyền  
 
     int exitcode;		
-    int numwait;                // số tiến trình đã join
-
     char FileName[32];          // Ten cua tien trinh
 
     Thread* thread;             // Tien trinh cua chuong trinh
@@ -31,14 +27,7 @@ public:
 
 
     void JoinWait();            // 1. Tiến trình cha đợi tiến trình con kết thúc
-                        
-    void ExitWait();             // 4. Tiến trình con kết thúc
-
     void JoinRelease();         // 2. Báo cho tiến trình cha thực thi tiếp
-    void ExitRelease();         // 3. Cho phép tiến trình con kết thúc
-
-    void IncNumWait();          // Tăng số tiến trình chờ
-    void DecNumWait();          // Giảm số tiến trình chờ
 
     void SetExitCode(int);      // Đặt exitcode của tiến trình
     int GetExitCode();          // Trả về exitcode

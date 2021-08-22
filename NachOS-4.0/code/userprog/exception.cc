@@ -149,24 +149,15 @@ void ExceptionHandler(ExceptionType which)
 				if (!kernel->machine->ReadMem(buffadd, 1, &ch))
 					return;
 			}
-
-			// AddrSpace *space;
-			// space = new AddrSpace();
-			// space->Load(filename);
-			// Thread *t;
-			// t = new Thread(filename);
-			// t->space = space;
-			// int processId;
-			// processId = t->getId(); /* create this function by yourself */
 			filename[i] = (char)0;
-			/* now filename contains the file */
-			//t->Fork(StartProcess, 0);
-			//kernel->machine->WriteRegister(2, processId);
 			extern PTable *pTab;
 			// Return child process id
+
 			int id;
 			id = pTab->ExecUpdate(filename);
 			kernel->machine->WriteRegister(2, id);
+
+
 			/* set previous programm counter (debugging only)*/
 			kernel->machine->WriteRegister(PrevPCReg, kernel->machine->ReadRegister(PCReg));
 			/* set programm counter to next instruction (all Instructions are 4 byte wide)*/

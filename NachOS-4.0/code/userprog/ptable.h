@@ -14,8 +14,6 @@ private:
 	Bitmap *bm;                 // đánh dấu các vị trí đã được sử dụng trong pcb
 	PCB* pcb[MAX_PROCESS];
 
-	Semaphore* bmsem;           // dùng để ngăn chặn trường hợp nạp 2 tiến trình cùng
-
 public:
      PTable(int = 10);           // Khoi tao size doi tuong pcb
                                 // de luu size process.
